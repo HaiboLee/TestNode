@@ -2,11 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="asset/js/socket.io.min.js"></script>
-    <script src="asset/js/test.js"></script>
+    <title>视频测试</title>
 </head>
 <body>
-<img src="asset/img/test.png">
+<video id="video" autoplay="" style='width:640px;height:480px'></video>
+<script type="text/javascript">
+    var video = document.getElementById("video");
+    var errocb = function () {
+        alert("sth srong");
+    }
+    var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+    if (navigator.getUserMedia) {
+        navigator.getUserMedia({ audio: true, video: { width: 1280, height: 720 } },
+                function(stream) {
+                    var video = document.querySelector('video');
+                    video.src = window.URL.createObjectURL(stream);
+                    //firefox不支持src,由下面代替
+                    //video.mozSrcObject= stream
+                    video.play();
+                },
+                function(err) {
+                    console.log("出错信息: " + err.name);
+                }
+        );
+    } else {
+        console.log("不支持getUserMedia");
+    }
+ /*else if (navigator.webkitGetUserMedia) {
+        navigator.webkitGetUserMedia({"video": true}, function (stream) {
+            video.src = window.webkitURL.createObjectURL(stream);
+            video.play();
+        }, errocb);
+    }
+    document.getElementById("paizhao").addEventListener("click", function () {
+        context.drawImage(video, 0, 0, 640, 480);
+    });*/
+</script>
 </body>
 </html>

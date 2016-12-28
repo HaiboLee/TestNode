@@ -1,22 +1,29 @@
-var express = require('express');
-var path = require('path');
-var app = express();
-//var server = require('http').createServer(app);
-app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/index.html');
+var app = require('express')();
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var privateKey  = fs.readFileSync(__dirname + '/path/to/private.pem', 'utf8');
+var certificate = fs.readFileSync(__dirname +'/path/to/file.crt', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+var PORT = 18080;
+var SSLPORT = 18081;
+
+httpServer.listen(PORT, function() {
+    console.log('HTTP Server is running on: http://localhost:%s', PORT);
 });
-app.use(express.static(path.join(__dirname,'public')));
-var server = app.listen('8888', function () {
-   console.log(path.join(__dirname,'asset'));
+httpsServer.listen(SSLPORT, function() {
+    console.log('HTTPS Server is running on: https://localhost:%s', SSLPORT);
 });
-var io = require('socket.io').listen(server);
-io.on('connection', function (socket) {
-    //console.log('用户连接');
-    io.on('m', function (obj) {
-        console.log(obj)
-        io.sockets.emit('m',obj);
-    });
-    io.on('m1', function (obj) {
-        io.sockets.emit('m1',obj);
-    });
+
+// Welcome
+app.get('/', function(req, res) {
+    if(req.protocol === 'https') {
+        res.status(200).send('Welcome to Safety Land!');
+    }
+    else {
+        res.status(200).send('Welcome!');
+    }
 });
